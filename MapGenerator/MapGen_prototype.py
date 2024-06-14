@@ -55,6 +55,7 @@ class MapPartitioner:
 
     def write_map_to_file(self, filename):
         with open(filename, 'w') as file:
+            file.truncate(0)  # Erase previous contents
             for z_slice in self.partitioned_map:
                 for row in z_slice:
                     file.write(' '.join(map(str, row)) + '\n')
@@ -75,6 +76,16 @@ class MapPartitioner:
             if z_slice:  # Add the last z slice if it exists
                 partitioned_map.append(z_slice)
         return partitioned_map
+    
+    @staticmethod
+    def PathWriter(map_data, filename):
+        with open(filename, 'w') as file:
+            file.truncate(0)
+            for z_slice in map_data:
+                for row in z_slice:
+                    file.write(' '.join(map(str, row)) + '\n')
+                file.write('\n')
+
 
 
 def get_map_from_file(filename):
@@ -92,6 +103,8 @@ def get_map(x, y,z, num_elevators, num_obstacles, filename):
     partitioner.generate_obstacles(num_obstacles)
     partitioner.print_map()
     partitioner.write_map_to_file(filename)
+
+
 
 if __name__ == "__main__":
     get_map(10, 10, 5, 7, 20, "../map.txt")

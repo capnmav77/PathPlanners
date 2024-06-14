@@ -3,16 +3,18 @@ from PathPlanningLibrary.Dijkistra import *
 
 # Example usage
 source_x, source_y, source_z = 0, 0, 0
-dest_x, dest_y, dest_z = 9, 9, 4
+dest_x, dest_y, dest_z = 2, 1, 4
 
 partitioned_map = MapPartitioner.read_map_from_file("map.txt")
-if(partitioned_map == None):
-    print("Error reading map from file")
-    exit()
 path = dijkstra(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
 if path:
     print("Shortest path:")
     for x, y, z in path:
         print(f"({x}, {y}, {z})", end=" -> ")
+        #modify the partitioned map to show the path by updating the coordinates of the path to 3
+        partitioned_map[z][x][y] = 3
+        #write the updated partitioned map to solved map.txt
+    MapPartitioner.PathWriter(partitioned_map, "solved_map.txt")
+
 else:
     print("No path found.")
