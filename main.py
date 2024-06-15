@@ -1,5 +1,6 @@
 from MapGenerator.MapGen_prototype import MapPartitioner
 from PathPlanningLibrary.Dijkistra import *
+from PathPlanningLibrary.Node import Node
 from PathPlanningLibrary.A_Star import *  
 
 # Example usage
@@ -10,7 +11,10 @@ partitioned_map = MapPartitioner.read_map_from_file("map.txt")
 
 #path = dijkstra(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
 
-path = A_star(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
+#path = A_star(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
+A_star_algo = A_Star(partitioned_map , source_x , source_y , source_z , dest_x, dest_y, dest_z)
+path = A_star_algo.find_path()
+
 if path:
     print("Shortest path:")
     for x, y, z in path:
