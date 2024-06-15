@@ -64,8 +64,8 @@ def find_path_on_level_heuristic(partitioned_map, source_x, source_y, source_z, 
             if 0 <= new_x < len(partitioned_map[0]) and 0 <= new_y < len(partitioned_map[0][0]) and partitioned_map[source_z][new_x][new_y] != 0:
                 heuristic_factor = abs(new_x - dest_x) + abs(new_y - dest_y)
                 if dx == 0 or dy == 0:
-                    heapq.heappush(pq, (cost + 1 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1)))
+                    heapq.heappush(pq, (cost + 1 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1 + heuristic_factor)))
                 else:
-                    heapq.heappush(pq, (cost + 1.4 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1.4)))
+                    heapq.heappush(pq, (cost + 1.4 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1.4 + heuristic_factor)))
 
     return None
