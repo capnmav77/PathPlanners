@@ -7,4 +7,5 @@
 - Occupied Space : 0
 - Elevator Shaft : -1 
 - Dynamically occupied Tile : 2
+- Shortest_path : 3
 - More research to be done 
