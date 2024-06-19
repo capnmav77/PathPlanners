@@ -2,7 +2,7 @@ import heapq
 from PathPlanningLibrary.Node import Node
 
 class A_Star:
-    def __init__(self, partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z):
+    def __init__(self, partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z,diagonal_traversal=False):
         self.partitioned_map = partitioned_map
         self.source_x = source_x
         self.source_y = source_y
@@ -10,6 +10,7 @@ class A_Star:
         self.dest_x = dest_x
         self.dest_y = dest_y
         self.dest_z = dest_z
+        self.diagonal_traversal = diagonal_traversal
         
     def find_path(self):
         if self.source_z == self.dest_z:
@@ -44,15 +45,21 @@ class A_Star:
                 continue
 
             visited.add((node.x, node.y, node.z))
-            for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0), (-1, 1), (1, 1), (1, -1), (-1, -1)]:
-                new_x, new_y = node.x + dx, node.y + dy
-                if 0 <= new_x < len(self.partitioned_map[0]) and 0 <= new_y < len(self.partitioned_map[0][0]) and self.partitioned_map[source_z][new_x][new_y] != 0:
-                    heuristic_factor = abs(new_x - dest_x) + abs(new_y - dest_y)
-                    if dx == 0 or dy == 0:
+            if self.diagonal_traversal:
+                for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0), (-1, 1), (1, 1), (1, -1), (-1, -1)]:
+                    new_x, new_y = node.x + dx, node.y + dy
+                    if 0 <= new_x < len(self.partitioned_map[0]) and 0 <= new_y < len(self.partitioned_map[0][0]) and self.partitioned_map[source_z][new_x][new_y] != 0:
+                        heuristic_factor = abs(new_x - dest_x) + abs(new_y - dest_y)
+                        if dx == 0 or dy == 0:
+                            heapq.heappush(pq, (cost + 1 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1 + heuristic_factor)))
+                        else:
+                            heapq.heappush(pq, (cost + 1.4 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1.4 + heuristic_factor)))
+            else:
+                for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                    new_x, new_y = node.x + dx, node.y + dy
+                    if 0 <= new_x < len(self.partitioned_map[0]) and 0 <= new_y < len(self.partitioned_map[0][0]) and self.partitioned_map[source_z][new_x][new_y] != 0:
+                        heuristic_factor = abs(new_x - dest_x) + abs(new_y - dest_y)
                         heapq.heappush(pq, (cost + 1 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1 + heuristic_factor)))
-                    else:
-                        heapq.heappush(pq, (cost + 1.4 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1.4 + heuristic_factor)))
-
         return None
     
     def find_nearest_elevator(self, x, y, z):

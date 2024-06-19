@@ -3,7 +3,7 @@ from PathPlanningLibrary.Node import Node
 
 
 class Dijkstra: 
-    def __init__(self, partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z):
+    def __init__(self, partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z, diagonal_traversal=False):
         self.partitioned_map = partitioned_map
         self.source_x = source_x
         self.source_y = source_y
@@ -11,6 +11,7 @@ class Dijkstra:
         self.dest_x = dest_x
         self.dest_y = dest_y
         self.dest_z = dest_z
+        self.diagonal_traversal = diagonal_traversal
 
     def find_path(self):
         if self.source_z == self.dest_z:
@@ -47,13 +48,20 @@ class Dijkstra:
                 continue
 
             visited.add((node.x, node.y, node.z))
-            for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0), (-1, 1), (1, 1), (1, -1), (-1, -1)]:
-                new_x, new_y = node.x + dx, node.y + dy
-                if 0 <= new_x < len(self.partitioned_map[0]) and 0 <= new_y < len(self.partitioned_map[0][0]) and self.partitioned_map[source_z][new_x][new_y] != 0:
-                    if dx == 0 or dy == 0:
-                        heapq.heappush(pq, (cost + 1, Node(new_x, new_y, source_z, node, cost + 1)))
-                    else:
-                        heapq.heappush(pq, (cost + 1.4, Node(new_x, new_y, source_z, node, cost + 1.4)))
+            if self.diagonal_traversal==False:
+                for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                    new_x, new_y = node.x + dx, node.y + dy
+                    if 0 <= new_x < len(self.partitioned_map[0]) and 0 <= new_y < len(self.partitioned_map[0][0]) and self.partitioned_map[source_z][new_x][new_y] != 0:
+                        heapq.heappush(pq, (cost + 1, Node(new_x, new_y, source_z, node)))
+            else:
+                for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0), (-1, 1), (1, 1), (1, -1), (-1, -1)]:
+                    new_x, new_y = node.x + dx, node.y + dy
+                    if 0 <= new_x < len(self.partitioned_map[0]) and 0 <= new_y < len(self.partitioned_map[0][0]) and self.partitioned_map[source_z][new_x][new_y] != 0:
+                        if dx == 0 or dy == 0:
+                            heapq.heappush(pq, (cost + 1, Node(new_x, new_y, source_z, node, cost + 1)))
+                        else:
+                            heapq.heappush(pq, (cost + 1.4, Node(new_x, new_y, source_z, node, cost + 1.4)))
+
         return None
         
         

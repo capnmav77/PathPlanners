@@ -2,19 +2,51 @@ from MapGenerator.MapGen_prototype import MapPartitioner
 from PathPlanningLibrary.Dijkistra import *
 from PathPlanningLibrary.Node import Node
 from PathPlanningLibrary.A_Star import *  
+from Agent_State import AgentNode
+from PackageScheduling import PacMan
 
-# Example usage
-source_x, source_y, source_z = 0, 0, 0
-dest_x, dest_y, dest_z = 2, 1, 4
+# # Example usage
+# source_x, source_y, source_z = 0, 0, 0
+# dest_x, dest_y, dest_z = 2, 1, 4
 
 partitioned_map = MapPartitioner.read_map_from_file("map.txt")
 
-#path = dijkstra(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
+# #path = dijkstra(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
 
-#path = A_star(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
-A_star_algo = Dijkstra(partitioned_map , source_x , source_y , source_z , dest_x, dest_y, dest_z)
-path = A_star_algo.find_path()
+# #path = A_star(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
 
+
+
+
+# A_star_algo = Dijkstra(partitioned_map , source_x , source_y , source_z , dest_x, dest_y, dest_z)
+# path = A_star_algo.find_path()
+
+# if path:
+#     print("Shortest path:")
+#     for x, y, z in path:
+#         print(f"({x}, {y}, {z})", end=" -> ")
+#         #modify the partitioned map to show the path by updating the coordinates of the path to 3
+#         partitioned_map[z][x][y] = 3
+#         #write the updated partitioned map to solved map.txt
+#     MapPartitioner.PathWriter(partitioned_map, "solved_map.txt")
+
+# else:
+#     print("No path found.")
+
+
+Agent = AgentNode.Agent(1, (0,0,0))
+print(Agent)
+PacMan = PacMan.PacMan()
+PacMan.make_new_package("package-1",(50,0,0))
+PacMan.assign_package("package-1",Agent,(0,0,0))
+print(Agent)
+agent_coords = Agent.get_current_coordinates()
+print(agent_coords)
+dest_coords = Agent.get_destination_coordinates()
+
+
+A_Star_algo = A_Star(partitioned_map , agent_coords[0],agent_coords[1],agent_coords[2], dest_coords[0],dest_coords[1],dest_coords[2])
+path = A_Star_algo.find_path()
 if path:
     print("Shortest path:")
     for x, y, z in path:
@@ -26,3 +58,39 @@ if path:
 
 else:
     print("No path found.")
+
+Agent.update_path(path)
+
+while Agent.get_state() == "transit":
+    Agent.move()
+    print(Agent)
+
+PacMan.pick_Package(Agent)
+print(Agent)
+
+agent_coords = Agent.get_current_coordinates()
+print(agent_coords)
+dest_coords = Agent.get_destination_coordinates()
+
+A_Star_algo = A_Star(partitioned_map , agent_coords[0],agent_coords[1],agent_coords[2], dest_coords[0],dest_coords[1],dest_coords[2])
+path = A_Star_algo.find_path()
+if path:
+    print("Shortest path:")
+    for x, y, z in path:
+        print(f"({x}, {y}, {z})", end=" -> ")
+        #modify the partitioned map to show the path by updating the coordinates of the path to 3
+        partitioned_map[z][x][y] = 3
+        #write the updated partitioned map to solved map.txt
+    MapPartitioner.PathWriter(partitioned_map, "solved_map.txt")
+
+else:
+    print("No path found.")
+
+Agent.update_path(path)
+
+while Agent.get_state() == "transit":
+    Agent.move()
+    print(Agent)
+
+PacMan.unassign_package(Agent)
+print(Agent)

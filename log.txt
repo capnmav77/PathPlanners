@@ -1,0 +1,12 @@
+Package package-1 assigned to agent 1.
+Package package-1 assigned to agent 1.
+Package package-1 unassigned from agent 1.
+Package package-1 assigned to agent 1.
+Agent 1 is picking up package package-1 at (0, 50, 0).
+Package package-1 unassigned from agent 1.
+Package package-1 assigned to agent 1.
+Agent 1 is picking up package package-1 at (50, 0, 0).
+Package package-1 unassigned from agent 1.
+Package package-1 assigned to agent 1.
+Agent 1 is picking up package package-1 at (50, 0, 0).
+Package package-1 unassigned from agent 1.
