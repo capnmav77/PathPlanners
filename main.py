@@ -9,6 +9,8 @@ from PackageScheduling import PacMan
 # source_x, source_y, source_z = 0, 0, 0
 # dest_x, dest_y, dest_z = 2, 1, 4
 
+
+
 partitioned_map = MapPartitioner.read_map_from_file("map.txt")
 
 # #path = dijkstra(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)
@@ -34,10 +36,14 @@ partitioned_map = MapPartitioner.read_map_from_file("map.txt")
 #     print("No path found.")
 
 
-Agent = AgentNode.Agent(1, (0,0,0))
-print(Agent)
+agent1 = AgentNode.Agent(1, (0,0,0))
+agent2 = AgentNode.Agent(2, (0,5,0))
+
 PacMan = PacMan.PacMan()
+PacMan.add_agent(agent1)
+PacMan.add_agent(agent2)
 PacMan.make_new_package("package-1",(50,0,0))
+Agent = PacMan.get_nearest_agent((50,0,0))
 PacMan.assign_package("package-1",Agent,(0,0,0))
 print(Agent)
 agent_coords = Agent.get_current_coordinates()

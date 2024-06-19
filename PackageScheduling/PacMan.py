@@ -1,10 +1,12 @@
 from PackageScheduling import packageNode
+from Agent_State import AgentNode
 
 
 class PacMan : 
     def __init__(self):
         # a list to keep track of all the packages in the environment
         self.stationary_Packages = []
+        self.Agents = []
 
         # a map to keep track of which agent is carrying which package
         self.agent_Packages_map = {} # key: agent, value: package
@@ -14,6 +16,20 @@ class PacMan :
             self.stationary_Packages.append(package)
         else:
             print("Package already exists.")
+    
+    def add_agent(self,agent):
+        if self.Agents.count(agent) == 0:
+            self.Agents.append(agent)
+        else:
+            print("Agent already exists.")
+    
+    def create_new_agent(self,agent_id,agent_loc):
+        for agent in self.Agents:
+            if agent.get_agent_id() == agent_id:
+                print("Agent already exists.")
+                return
+        agent = AgentNode.Agent(agent_id,agent_loc)
+        self.add_agent(agent)
 
     def remove_package(self,package):
         if self.stationary_Packages.count(package) == 1:
@@ -68,6 +84,21 @@ class PacMan :
 
         self.logging(f"Package {package.get_package_name()} unassigned from agent {agent.get_agent_id()}.")
         
+    def get_nearest_agent(self,package_loc):
+        min_distance = float("inf")
+        nearest_agent = None
+        for agent in self.Agents:
+            distance = abs(agent.get_current_coordinates()[0] - package_loc[0]) + abs(agent.get_current_coordinates()[1] - package_loc[1]) + 10*abs(agent.get_current_coordinates()[2] - package_loc[2])
+            if distance < min_distance:
+                if agent in self.agent_Packages_map:
+                    continue
+                min_distance = distance
+                nearest_agent = agent
+        if nearest_agent == None:
+            print("No agent available.")
+        else: 
+            self.logging(f"Nearest agent to package at {package_loc} is {nearest_agent.get_agent_id()}.")
+        return nearest_agent
 
     def logging(self,message):
         with open ("log.txt", "a") as file: 
