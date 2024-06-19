@@ -6,7 +6,7 @@ class MapPartitioner:
         self.y = y
         self.z = z
         self.num_elevators = num_elevators
-        self.partitioned_map = [[[1 for _ in range(x)] for _ in range(y)] for _ in range(z)] # how to call : partitioned_map[z][x][y]
+        self.partitioned_map = [[[1 for _ in range(x)] for _ in range(y)] for _ in range(z)] # how to call -> partitioned_map[z][x][y]
         self.sector_size = 3
         self.coordinates_center = []
 
@@ -46,6 +46,13 @@ class MapPartitioner:
                 self.partitioned_map[j][x][y] = -1
             num_elevators_placed += 1
             self.coordinates_center.pop(i)
+    
+    def add_picking_station(self):
+        # picking station is in the form of a 4X1 rectangle at the middle 
+        for j in range(self.x//2 - 2, self.x//2 + 2):
+            self.partitioned_map[0][j][0] = 5
+            self.partitioned_map[0][j][1] = 1
+            self.partitioned_map[0][j][2] = 1
 
     def print_map(self):
         for z_slice in self.partitioned_map:
@@ -101,11 +108,12 @@ def get_map(x, y,z, num_elevators, num_obstacles, filename):
     partitioner = MapPartitioner(x, y, z, num_elevators)
     partitioner.partition_map()
     partitioner.generate_obstacles(num_obstacles)
+    partitioner.add_picking_station()
     partitioner.print_map()
     partitioner.write_map_to_file(filename)
 
 
 
 if __name__ == "__main__":
-    get_map(10, 10, 5, 7, 20, "../map.txt")
+    get_map(100, 100, 5, 12, 1000, "../map.txt")
     #get_map_from_file("map.txt")
