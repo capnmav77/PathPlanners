@@ -2,26 +2,20 @@ import heapq
 from PathPlanningLibrary.Node import Node
 
 class A_Star:
-    def __init__(self, partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z,diagonal_traversal=False):
+    def __init__(self, partitioned_map,diagonal_traversal=False):
         self.partitioned_map = partitioned_map
-        self.source_x = source_x
-        self.source_y = source_y
-        self.source_z = source_z
-        self.dest_x = dest_x
-        self.dest_y = dest_y
-        self.dest_z = dest_z
         self.diagonal_traversal = diagonal_traversal
         
-    def find_path(self):
+    def find_path(self,source_x , source_y, source_z, dest_x, dest_y, dest_z):
         if self.source_z == self.dest_z:
-            return self.find_path_on_level_heuristic(self.source_x,self.source_y,self.source_z , self.dest_x, self.dest_y, self.dest_z)
+            return self.find_path_on_level_heuristic(source_x,source_y,source_z , dest_x, dest_y, dest_z)
         else : 
-            start_elevator = self.find_nearest_elevator(self.source_x,self.source_y,self.source_z)
+            start_elevator = self.find_nearest_elevator(source_x,source_y,source_z)
             if start_elevator is None:
                 return None
     
-        source_to_elevator = self.find_path_on_level_heuristic(self.source_x,self.source_y,self.source_z , start_elevator[0], start_elevator[1], self.source_z)
-        elevator_to_dest = self.find_path_on_level_heuristic(start_elevator[0],start_elevator[1],self.dest_z , self.dest_x, self.dest_y , self.dest_z)
+        source_to_elevator = self.find_path_on_level_heuristic(source_x,source_y,source_z , start_elevator[0], start_elevator[1],source_z)
+        elevator_to_dest = self.find_path_on_level_heuristic(start_elevator[0],start_elevator[1],dest_z , dest_x, dest_y ,dest_z)
 
         if source_to_elevator and elevator_to_dest:
             return source_to_elevator + elevator_to_dest

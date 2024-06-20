@@ -16,7 +16,6 @@ class Agent():
         return self.current_coordinates
     
     def get_destination_coordinates(self):
-        self.state = "transit"
         return self.destination_coordinates
     
     def get_state(self):
@@ -25,19 +24,24 @@ class Agent():
     def set_destination(self , destination_coordinates):
         self.state = "transit"
         self.destination_coordinates = destination_coordinates
+        self.path = []
+        self.path_index = 0
     
-    def update_path(self , path):
+    def update_new_path(self , path):
         self.path = path
         self.path_index = 0
     
     def move(self):
-        if self.path_index < len(self.path):
+        if self.current_coordinates != self.destination_coordinates:
             self.current_coordinates = self.path[self.path_index]
             self.path_index += 1
             return self.current_coordinates
         else:
             self.state = "idle"
-            return False
+            return self.current_coordinates
+        
+    def get_path(self):
+        return self.path[self.path_index:] # return the remaining path
         
     def __str__(self):
         return f"Agent {self.agent_id} at {self.current_coordinates} going to {self.destination_coordinates} with state {self.state}"
