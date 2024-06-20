@@ -5,11 +5,11 @@ from MapGenerator import MapGen_prototype
 
 
 class CentralCoordinator:
-    def __init__(self):
+    def __init__(self, partitioned_map):
         self.agents = []
         self.PacMan = PacMan.PacMan()
         self.agent_Packages_map = {}
-        self.Partitioned_map = MapGen_prototype.MapPartitioner.read_map_from_file("../map.txt")
+        self.Partitioned_map = partitioned_map#MapGen_prototype.MapPartitioner.read_map_from_file("../map.txt")
         self.A_star_algo = A_Star.A_Star(partitioned_map=self.Partitioned_map,diagonal_traversal=False)
         
 
@@ -50,7 +50,7 @@ class CentralCoordinator:
             return False
         package = self.PacMan.get_Package(package_name)
         if agent != None and package != None:
-            agent.set_destination(self, package.get_package_loc())
+            agent.set_destination(package.get_package_loc())
             package.set_destination(destination_coordinates)
             self.agent_Packages_map[agent] = package
             print(f"Package {package.get_package_name()} assigned to agent {agent.get_agent_id()}.")
@@ -111,6 +111,7 @@ class CentralCoordinator:
                 print("Package does not exist.")
                 return False
         else:
+            print("making new package")
             package = self.PacMan.make_new_package(package_name,package_loc)
 
         # assigning the package
@@ -122,8 +123,9 @@ class CentralCoordinator:
         min_distance = float("inf")
         for agent in self.agents:
             if agent.get_state() == "idle":
-                distance_coords = package.get_package_loc() - agent.get_current_coordinates()
-                distance_ = abs(distance_coords[0]) + abs(distance_coords[1]) + 3*abs(distance_coords[2])
+                package_location = package.get_package_loc()
+                agent_location = agent.get_current_coordinates()
+                distance_ = (package_location[0] - agent_location[0]) + (package_location[1] - agent_location[1]) + 2*(package_location[2] - agent_location[2])
                 if distance_ < min_distance:
                     min_distance = distance_
                     selected_agent = agent

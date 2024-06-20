@@ -9,7 +9,7 @@ class PacMan :
 
     def make_new_package(self,package_name,package_loc,package_dest=None):
         package = packageNode.PackageNode(package_name,package_loc,package_dest)
-        self.add_package(package)
+        self.Packages.append(package)
         return package
 
     def remove_Package(self,package):

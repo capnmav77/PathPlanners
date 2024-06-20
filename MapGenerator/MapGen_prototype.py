@@ -50,9 +50,12 @@ class MapPartitioner:
     def add_picking_station(self):
         # picking station is in the form of a 4X1 rectangle at the middle 
         for j in range(self.x//2 - 2, self.x//2 + 2):
+            if self.partitioned_map[0][j][0] == -1 or self.partitioned_map[0][j][1] == -1 :
+                for k in range(0,self.z):
+                    self.partitioned_map[k][j][0] = 1
+                    self.partitioned_map[k][j][1] = 1
             self.partitioned_map[0][j][0] = 5
             self.partitioned_map[0][j][1] = 1
-            self.partitioned_map[0][j][2] = 1
 
     def print_map(self):
         for z_slice in self.partitioned_map:
@@ -115,5 +118,5 @@ def get_map(x, y,z, num_elevators, num_obstacles, filename):
 
 
 if __name__ == "__main__":
-    get_map(100, 100, 5, 12, 1000, "../map.txt")
+    get_map(10, 10, 3, 5, 10, "../map.txt")
     #get_map_from_file("map.txt")
