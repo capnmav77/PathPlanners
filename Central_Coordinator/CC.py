@@ -43,6 +43,18 @@ class CentralCoordinator:
         self.PacMan.remove_Package(package)
 
 
+    def update_map(self,path):
+        for coordinates in path:
+            print(f"Updating coordinates: {coordinates}")
+            if self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] == -1 or self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] == 5:
+                continue
+            else:
+                self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] += 2
+        print("Map updated.")
+        MapGen_prototype.MapPartitioner.PathWriter(self.Partitioned_map,"map.txt")
+
+
+
     def assign_package(self,package_name,agent_id,destination_coordinates):
         agent = self.get_agent(agent_id)
         if agent.get_state() == "transit":
@@ -69,16 +81,44 @@ class CentralCoordinator:
         if agent in self.agent_Packages_map:
             agent_loc = agent.get_current_coordinates()
             package_loc = agent.get_destination_coordinates()
-            path = self.A_star_algo.find_path(self,agent_loc[0],agent_loc[1],agent_loc[2],package_loc[0],package_loc[1],package_loc[2])   
+            path = self.A_star_algo.find_path(agent_loc[0],agent_loc[1],agent_loc[2],package_loc[0],package_loc[1],package_loc[2])   
+
+            if(path == None):
+                print("Error - 02 : failed to get source to destination , try a different map")
+                return None
+            
+            #path = path[1:]
             agent.update_new_path(path) 
-            while(agent.move() != package_loc):
-                #implement the deadlock avoidance function here
-                pass
+            self.update_map(path)
+
+
+            while(agent.get_current_coordinates() != package_loc):
+                if(self.collision_avoider(agent)):
+                    agent.wait()
+                    #implement the deadlock avoidance function here
+                else:
+                    agent.move()
+
+                    coords = agent.get_current_coordinates()
+
+                    print(f"Agent {agent.get_agent_id()} at {coords}")
+
+                    if(self.Partitioned_map[coords[2]][coords[0]][coords[1]] != 5 and self.Partitioned_map[coords[2]][coords[0]][coords[1]] != -1):
+                        self.Partitioned_map[coords[2]][coords[0]][coords[1]]  -= 2
+
+                    MapGen_prototype.MapPartitioner.PathWriter(self.Partitioned_map,"map.txt")
+
+                    scan = input("Press any key to continue")
+
+
+
             print("agent has reached the package ")
             agent.set_destination(self.agent_Packages_map[agent].get_package_dest())
+            return True
             
         else:
             print("Agent is not assigned any package.")
+            return False
         
     
     def deliver_package(self,agent_id):
@@ -86,18 +126,44 @@ class CentralCoordinator:
         if agent in self.agent_Packages_map:
             agent_loc = agent.get_current_coordinates()
             package_loc = agent.get_destination_coordinates()
-            path = self.A_star_algo.find_path(self,agent_loc[0],agent_loc[1],agent_loc[2],package_loc[0],package_loc[1],package_loc[2])   
+            path = self.A_star_algo.find_path(agent_loc[0],agent_loc[1],agent_loc[2],package_loc[0],package_loc[1],package_loc[2])   
+
+            if(path == None):
+                print("Error - 02 : failed to get source to destination , try a different map")
+                return None
+            
+            #path = path[1:]
             agent.update_new_path(path) 
-            while(agent.move() != package_loc):
-                #implement the deadlock avoidance function here
-                pass
+            self.update_map(path)
+
+
+            while(agent.get_current_coordinates() != package_loc):
+                if(self.collision_avoider(agent)):
+                    agent.wait()
+                    #implement the deadlock avoidance function here
+                else:
+                    agent.move()
+
+                    coords = agent.get_current_coordinates()
+
+                    print(f"Agent {agent.get_agent_id()} at {coords}")
+
+                    if(self.Partitioned_map[coords[2]][coords[0]][coords[1]] != 5 and self.Partitioned_map[coords[2]][coords[0]][coords[1]] != -1):
+                        self.Partitioned_map[coords[2]][coords[0]][coords[1]]  -= 2
+
+                    MapGen_prototype.MapPartitioner.PathWriter(self.Partitioned_map,"map.txt")
+                    scan = input("Press any key to continue")
+
             print("agent has delivered the package ")
             self.agent_Packages_map[agent].set_destination(None)
             self.agent_Packages_map[agent].update_package_loc(agent.get_current_coordinates())
             self.agent_Packages_map.pop(agent)
+            return True
             
         else:
             print("Agent is not assigned any package.")
+            return False
+
 
     def package_scheduler(self, package_name, package_loc = None, package_dest = None):
         if package_dest == None:
@@ -135,8 +201,23 @@ class CentralCoordinator:
             return False
         
         self.assign_package(package_name,selected_agent.get_agent_id(),package_dest)
-        print(f"Package assigned to agent: {selected_agent.get_agent_id()}.")
-        return True
+        if self.pick_package(selected_agent.get_agent_id()) :
+            print(f"Package picked up by agent: {selected_agent.get_agent_id()}.")
+            if self.deliver_package(selected_agent.get_agent_id()):
+                print(f"Package has been delivered {selected_agent.get_agent_id()}.")
+        
+                return True
+        
+        return False
+    
+
+    def collision_avoider(self,agent):
+        for agent_ in self.agents:
+            if agent_!=agent and agent_.get_current_coordinates() == agent.get_next_coordinates():
+                print("next coordinates: ",agent.get_next_coordinates())
+                return True
+        return False
+
 
         
     

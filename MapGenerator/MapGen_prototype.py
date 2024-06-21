@@ -6,9 +6,12 @@ class MapPartitioner:
         self.y = y
         self.z = z
         self.num_elevators = num_elevators
-        self.partitioned_map = [[[1 for _ in range(x)] for _ in range(y)] for _ in range(z)] # how to call -> partitioned_map[z][x][y]
+        self.partitioned_map = None
         self.sector_size = 3
         self.coordinates_center = []
+        
+    def set_partitioned_map(self, partitioned_map):
+        self.partitioned_map = partitioned_map
 
     def recal_sector(self, start_x, start_y):
         center_x = start_x + self.sector_size // 2
@@ -34,6 +37,7 @@ class MapPartitioner:
                             self.partitioned_map[k][x + i][y] = 0
 
     def partition_map(self):
+        self.partitioned_map = [[[1 for _ in range(self.y)] for _ in range(self.x)] for _ in range(self.z)] # how to call -> partitioned_map[z][x][y]
         for i in range(0, self.x, self.sector_size):
             for j in range(0, self.y, self.sector_size):
                 self.recal_sector(i, j)

@@ -14,13 +14,10 @@ from Central_Coordinator import CC
 
 partitioned_map = MapPartitioner.read_map_from_file("map.txt")
 CC = CC.CentralCoordinator(partitioned_map)
-agent1 = CC.add_agent(1,(3,0,0))
-agent2 = CC.add_agent(2,(3,4,0))
-agent3 = CC.add_agent(3,(3,8,0))
-package1 = CC.create_package("package-1",(0,5,0))
+agent1 = CC.add_agent(1,(0,3,0))
+package1 = CC.create_package("package-1",(5,0,0))
 
-CC.package_scheduler(package_name="package-1",package_loc=(0,5,0),package_dest=(9,9,1)) 
-
+CC.package_scheduler(package_name="package-1",package_loc=(5,0,0),package_dest=(9,9,1)) 
 
 
 # #path = dijkstra(partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z)

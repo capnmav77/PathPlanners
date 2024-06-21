@@ -20,6 +20,15 @@ class Agent():
     
     def get_state(self):
         return self.state
+
+    def get_next_coordinates(self):
+        if self.path_index < len(self.path):
+            return self.path[self.path_index]
+        else: 
+            return None
+    
+    def wait(self):
+        self.state = "idle"
     
     def set_destination(self , destination_coordinates):
         self.state = "transit"
@@ -35,10 +44,10 @@ class Agent():
         if self.current_coordinates != self.destination_coordinates:
             self.current_coordinates = self.path[self.path_index]
             self.path_index += 1
-            return self.current_coordinates
+            #return self.current_coordinates
         else:
             self.state = "idle"
-            return self.current_coordinates
+            #return self.current_coordinates
         
     def get_path(self):
         return self.path[self.path_index:] # return the remaining path

@@ -6,8 +6,8 @@ class A_Star:
         self.partitioned_map = partitioned_map
         self.diagonal_traversal = diagonal_traversal
         
-    def find_path(self,source_x , source_y, source_z, dest_x, dest_y, dest_z):
-        if self.source_z == self.dest_z:
+    def find_path(self, source_x , source_y, source_z, dest_x, dest_y, dest_z):
+        if source_z == dest_z:
             return self.find_path_on_level_heuristic(source_x,source_y,source_z , dest_x, dest_y, dest_z)
         else : 
             start_elevator = self.find_nearest_elevator(source_x,source_y,source_z)
@@ -53,6 +53,8 @@ class A_Star:
                     new_x, new_y = node.x + dx, node.y + dy
                     if 0 <= new_x < len(self.partitioned_map[0]) and 0 <= new_y < len(self.partitioned_map[0][0]) and self.partitioned_map[source_z][new_x][new_y] != 0:
                         heuristic_factor = abs(new_x - dest_x) + abs(new_y - dest_y)
+                        if(self.partitioned_map[source_z][new_x][new_y] > 1):
+                            heuristic_factor = heuristic_factor*self.partitioned_map[source_z][new_x][new_y]
                         heapq.heappush(pq, (cost + 1 + heuristic_factor, Node(new_x, new_y, source_z, node, cost + 1 + heuristic_factor)))
         return None
     
