@@ -1,36 +1,27 @@
 import heapq
 from PathPlanningLibrary.Node import Node
 
-
 class Dijkstra: 
-    def __init__(self, partitioned_map, source_x, source_y, source_z, dest_x, dest_y, dest_z, diagonal_traversal=False):
+    def __init__(self, partitioned_map,diagonal_traversal=False):
         self.partitioned_map = partitioned_map
-        self.source_x = source_x
-        self.source_y = source_y
-        self.source_z = source_z
-        self.dest_x = dest_x
-        self.dest_y = dest_y
-        self.dest_z = dest_z
         self.diagonal_traversal = diagonal_traversal
-
-    def find_path(self):
-        if self.source_z == self.dest_z:
-            # Source and destination are on the same level
-            return self.find_path_on_level(self.source_x, self.source_y, self.source_z, self.dest_x, self.dest_y, self.dest_z)
-        else:
-            # Find the nearest elevator on the source level
-            start_elevator = self.find_nearest_elevator(self.source_x, self.source_y, self.source_z)
+        
+    def find_path(self, source_x , source_y, source_z, dest_x, dest_y, dest_z):
+        if source_z == dest_z:
+            return self.find_path_on_level(source_x,source_y,source_z , dest_x, dest_y, dest_z)
+        else : 
+            start_elevator = self.find_nearest_elevator(source_x,source_y,source_z)
             if start_elevator is None:
                 return None
+    
+        source_to_elevator = self.find_path_on_level(source_x,source_y,source_z , start_elevator[0], start_elevator[1],source_z)
+        elevator_to_dest = self.find_path_on_level(start_elevator[0],start_elevator[1],dest_z , dest_x, dest_y ,dest_z)
 
-            # Combine paths: source -> start_elevator, start_elevator -> end_elevator, end_elevator -> destination
-            source_to_start_elevator = self.find_path_on_level(self.source_x, self.source_y, self.source_z, start_elevator[0], start_elevator[1], self.source_z)
-            end_elevator_to_dest = self.find_path_on_level(start_elevator[0], start_elevator[1], self.dest_z, self.dest_x, self.dest_y, self.dest_z)
-
-            if source_to_start_elevator and end_elevator_to_dest:
-                return source_to_start_elevator + end_elevator_to_dest
-            else:
-                return None
+        if source_to_elevator and elevator_to_dest:
+            return source_to_elevator + elevator_to_dest
+        else:
+            print("Error - 03 : failed to get source to destination , try a different map")
+            return None
 
     def find_path_on_level(self, source_x, source_y, source_z, dest_x, dest_y, dest_z):
         pq = [(0, Node(source_x, source_y, source_z))]

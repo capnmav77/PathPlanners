@@ -2,6 +2,7 @@ from Agent_State import AgentNode
 from PackageScheduling import PacMan
 from PathPlanningLibrary import A_Star
 from MapGenerator import MapGen_prototype
+from Central_Coordinator import Collision_Manager
 
 
 class CentralCoordinator:
@@ -11,8 +12,9 @@ class CentralCoordinator:
         self.agent_Packages_map = {}
         self.Partitioned_map = partitioned_map#MapGen_prototype.MapPartitioner.read_map_from_file("../map.txt")
         self.A_star_algo = A_Star.A_Star(partitioned_map=self.Partitioned_map,diagonal_traversal=False)
+        self.collision_Manager = Collision_Manager.Collision_Manager()
         
-
+    #agent management functions
     def add_agent(self,agent_id,current_coordinates):
         agent = AgentNode.Agent(agent_id,current_coordinates)
         self.agents.append(agent)
@@ -35,24 +37,13 @@ class CentralCoordinator:
         return None
     
 
+    #package management functions
     def create_package(self,package_name,package_loc,package_dest=None):
         return self.PacMan.make_new_package(package_name,package_loc,package_dest)
     
 
     def remove_package(self,package):
         self.PacMan.remove_Package(package)
-
-
-    def update_map(self,path):
-        for coordinates in path:
-            print(f"Updating coordinates: {coordinates}")
-            if self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] == -1 or self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] == 5:
-                continue
-            else:
-                self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] += 2
-        print("Map updated.")
-        MapGen_prototype.MapPartitioner.PathWriter(self.Partitioned_map,"map.txt")
-
 
 
     def assign_package(self,package_name,agent_id,destination_coordinates):
@@ -93,7 +84,7 @@ class CentralCoordinator:
 
 
             while(agent.get_current_coordinates() != package_loc):
-                if(self.collision_avoider(agent)):
+                if(self.collision_Manager.detect_collision(agent, self.agents)):
                     agent.wait()
                     #implement the deadlock avoidance function here
                 else:
@@ -138,7 +129,7 @@ class CentralCoordinator:
 
 
             while(agent.get_current_coordinates() != package_loc):
-                if(self.collision_avoider(agent)):
+                if(self.collision_Manager.detect_collision(agent, self.agents)):
                     agent.wait()
                     #implement the deadlock avoidance function here
                 else:
@@ -164,7 +155,7 @@ class CentralCoordinator:
             print("Agent is not assigned any package.")
             return False
 
-
+    #scheduling functions
     def package_scheduler(self, package_name, package_loc = None, package_dest = None):
         if package_dest == None:
             print("Destination not provided.")
@@ -210,13 +201,18 @@ class CentralCoordinator:
         
         return False
     
+    #map functions
+    def update_map(self,path):
+        for coordinates in path:
+            print(f"Updating coordinates: {coordinates}")
+            if self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] == -1 or self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] == 5:
+                continue
+            else:
+                self.Partitioned_map[coordinates[2]][coordinates[0]][coordinates[1]] += 2
+        print("Map updated.")
+        MapGen_prototype.MapPartitioner.PathWriter(self.Partitioned_map,"map.txt")
 
-    def collision_avoider(self,agent):
-        for agent_ in self.agents:
-            if agent_!=agent and agent_.get_current_coordinates() == agent.get_next_coordinates():
-                print("next coordinates: ",agent.get_next_coordinates())
-                return True
-        return False
+
 
 
         
