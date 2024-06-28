@@ -1,11 +1,11 @@
 # Path Planning 
-- it's a process of planning a path from source to destination , but here in a 3 dimensional space 
-
+- Repository containing Low level , modular and Extensible Implementation of ASRS for 3-Dimensional Environments.
 
 ## MAP Agenda : 
 - Free space : 1
 - Occupied Space : 0
 - Elevator Shaft : -1 
-- Dynamically occupied Tile : 2
-- Shortest_path : 3
-- More research to be done 
+- Dynamically occupied Tile : -2
+- Shortest_path : >1
+
+## Demonstration: 
