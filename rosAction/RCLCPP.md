@@ -240,3 +240,68 @@ private:
 };
 ```
 
+## writing a Object for path planning : 
+- include and other stuff , blah blah blah
+  - rclcpp
+  - visualization_msgs -> marker
+  - geometry messages -> pose , point
+  - service call format
+  - some extra shit i was doing this eve
+ 
+- Path :
+  - contains serial_id of the agent
+  - double time of plan -> timestamp of when it was planned
+  - geometry messages -> point list / vector of points that are used to depict the path
+ 
+- Enum status - free , occupied , start , stop .
+
+- Grid Node -> used to depict a single grid Node of the map , it is supposed to be scalable , how to achieve i dunno , let's see
+  - stat -> status of the node
+  - is_closed -> flag indicating if the node has been processed
+  - G_cost -> cost of reaching this node from the start node
+  - F-Cost -> total cost including teh G and heuristic estimate
+  - pos -> position of the node
+  - parent -> parent node from which this node is reached in the path , it stores the point of the parent 
+  - oper -> dunno , dont' even need this shit
+ 
+- Motion Planner :
+  - creates a service /get_plan for handling requests to plan paths
+  ``` cpp
+  class Motion_Planner
+  {
+  public:
+      explicit Motion_Planner(std::shared_ptr<rclcpp::Node> node, const int period = 10)
+          : node_(node), period_(period)
+      {
+          RCLCPP_INFO(node_->get_logger(), "This is %d", PI);
+          service_ = node_->create_service<my_robot_interfaces::srv::GetPlan>("/get_plan", std::bind(&Motion_Planner::planner_get_plan,this,_1,_2));
+          RCLCPP_INFO(node_->get_logger(), "Motion Planner Service Ready");
+      }
+  ```
+  - private members:
+    - node_ = shared pointer to the ros2 node
+    - service_ = service for handling path planning request
+    - period_ = tiem period in seconds for traversal
+    - archived_paths = vector to stroe the paths
+   
+- Methods :
+  - planner_plan_path : plans the path using A* algo between start point and goal , considering the serial_id and the collisions
+  - planner_get_plan : service callback fun , triggered when a "getplan" service request is received . it extracts start goal points and end goal points from the request , plans the path using planner_plan_path and fills the response with res
+ 
+- Planner_plan_path :
+  - grid init : 11x11 doing here
+  - start and goal
+  - a* algo :
+    - iter -> list not empty
+    - picks the node with lowest F-cost from open list
+    - marks the node as closed
+    - goal - reached , reconstruct the path from goal to start using parent pointers
+    - expands the neighbouring nodes
+    - sorts based on F_cost
+   
+- Planner_get_Plan : 
+  - service callback -> handles the incoming requests for /get_plan service
+  - start and goal points : extracts them and assigns to planner_plan_path
+  - planner plan path returns the path with serial id
+  - response : set's the res->path and cuts . 
+
